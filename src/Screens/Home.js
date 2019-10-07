@@ -1,17 +1,41 @@
 import React from 'react';
-import {StyleSheet, Platform, Image, Text, View} from 'react-native';
+import {
+  StyleSheet,
+  FlatList,
+  SafeAreaView,
+  Text,
+  StatusBar,
+} from 'react-native';
 import firebase from 'firebase';
 import AsyncStorage from '@react-native-community/async-storage';
 import User from '../User';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 export default class Home extends React.Component {
+  static navigationOptions = {
+    title: 'User List',
+  };
 
-
-  state = {currentUser: null};
+  state = { users: []};
 
   componentDidMount() {
-    this.setState({currentUser: User});
+    let dbRef = firebase.database().ref('users');
+    dbRef.on('child_added', val => {
+      let person = val.val();
+      person.uid = val.key;
+      
+      if (person.uid == User.uid) {
+        
+        person.name = User.name;
+     
+      } else {
+        this.setState(prevState => {
+          return {
+            users: [...prevState.users, person],
+          };
+        });
+      }
+    });
   }
 
   logout = () => {
@@ -19,22 +43,38 @@ export default class Home extends React.Component {
     this.props.navigation.navigate('Login');
   };
 
-  render() {
-    const {currentUser} = this.state;
+  renderRow = ({item}) => {
     return (
-      <View style={styles.container}>
-        <Text style={{fontSize: 20}}>
-          {' '}
-          Hi
-          <Text style={{color: '#e93766', fontSize: 20}}>
-            {currentUser && currentUser.email}!
-          </Text>
-        </Text>
-      <TouchableOpacity onPress={this.logout}>
-        <Text>Logout</Text>
+      <TouchableOpacity
+        key={item.uid}
+        style={styles.userList}
+        onPress={() =>
+          this.props.navigation.navigate('Chat', {
+            uid: item.uid,
+            name: item.name,
+            email: item.email,
+          })
+        }>
+        <Text style={styles.userListName}>{item.name}</Text>
       </TouchableOpacity>
-      </View>
+    );
+  };
 
+  render() {
+  
+    return (
+      <SafeAreaView>
+        <StatusBar backgroundColor="orange" barStyle="light-content" />
+
+        <FlatList
+          data={this.state.users}
+          renderItem={this.renderRow}
+          keyExtractor={item => item.uid}
+        />
+        <TouchableOpacity onPress={this.logout}>
+          <Text>Logout</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
     );
   }
 }
@@ -43,5 +83,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  userList: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#FFB449',
+  },
+
+  userListName: {
+    fontSize: 20,
   },
 });

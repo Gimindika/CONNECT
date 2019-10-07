@@ -28,7 +28,7 @@ class Register extends React.Component {
   };
 
   register = () => {
-    // this.setState({isLoading: true});
+    this.setState({isLoading: true});
     if (
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.state.email)
     ) {

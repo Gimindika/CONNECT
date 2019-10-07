@@ -10,7 +10,7 @@ import {
   ToastAndroid,
   ActivityIndicator,
 } from 'react-native';
-// import firebase from 'react-native-firebase';
+
 import firebase from 'firebase';
 import AsyncStorage from '@react-native-community/async-storage'
 import User from '../User';
@@ -28,7 +28,7 @@ class Login extends React.Component {
   };
 
   login = () => {
-    // this.setState({isLoading:true})
+    this.setState({isLoading:true})
     if (
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.state.email)
     ) {
@@ -40,6 +40,8 @@ class Login extends React.Component {
           .then(() => {
             AsyncStorage.setItem('userEmail',this.state.email)
             User.email = this.state.email;
+            
+
             this.setState({isLoading:false})
             ToastAndroid.showWithGravity(
               'Have a Nice Conversation',
