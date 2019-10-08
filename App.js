@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Router from './Router';
-import Login from './src/Screens/Login';
+import AppState from './src/AppState';
 import firebase from 'firebase';
 import firebasekey from './firebasekey';
 
@@ -22,7 +22,12 @@ firebase.initializeApp(firebaseConfig);
 
 const App = () => {
 
-  return <Router />;
+  return (
+  <React.Fragment>
+    <Router />
+    <AppState/>
+  </React.Fragment>  
+  );
 };
 
 export default App;

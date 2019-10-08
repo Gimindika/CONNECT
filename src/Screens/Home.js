@@ -26,7 +26,7 @@ export default class Home extends React.Component {
       
       if (person.uid == User.uid) {
         
-        person.name = User.name;
+        person.displayName = User.displayName;
      
       } else {
         this.setState(prevState => {
@@ -39,6 +39,14 @@ export default class Home extends React.Component {
   }
 
   logout = () => {
+    
+    firebase
+    .database()
+    .ref('users/' + User.uid)
+    .set({
+      ...User,
+      status:'offline'
+    });
     AsyncStorage.clear();
     this.props.navigation.navigate('Login');
   };
@@ -51,11 +59,12 @@ export default class Home extends React.Component {
         onPress={() =>
           this.props.navigation.navigate('Chat', {
             uid: item.uid,
-            name: item.name,
+            displayName: item.displayName,
             email: item.email,
+            status: item.status
           })
         }>
-        <Text style={styles.userListName}>{item.name}</Text>
+        <Text style={styles.userListDisplayName}>{item.displayName + '('+item.status+')'}</Text>
       </TouchableOpacity>
     );
   };
@@ -91,7 +100,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#FFB449',
   },
 
-  userListName: {
+  userListDisplayName: {
     fontSize: 20,
   },
 });

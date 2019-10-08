@@ -23,8 +23,8 @@ class Register extends React.Component {
     isLoading: false,
   };
 
-  inputHandler = (name, value) => {
-    this.setState(() => ({[name]: value}));
+  inputHandler = (displayName, value) => {
+    this.setState(() => ({[displayName]: value}));
   };
 
   register = () => {
@@ -49,7 +49,8 @@ class Register extends React.Component {
                 currentUser = firebase.auth().currentUser;
                 User.uid = currentUser.uid
                 User.email = currentUser.email
-                User.name = currentUser.name
+                User.displayName = currentUser.email,
+                User.status = 'online'
                
                 ToastAndroid.showWithGravity(
                   'Register success, welcome to CONNECT.',
@@ -61,7 +62,7 @@ class Register extends React.Component {
                 firebase
                   .database()
                   .ref('users/' + User.uid)
-                  .set({name: this.state.email}).then(
+                  .set(User).then(
                     console.log('success', 'users/' + User.uid)
                     
                   ).catch(error => console.log(error)

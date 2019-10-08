@@ -15,14 +15,14 @@ import {FlatList} from 'react-native-gesture-handler';
 export default class Chat extends React.Component {
   static navigationOptions = ({navigation}) => {
     return {
-      title: navigation.getParam('name', null),
+      title: navigation.getParam('displayName', null),
     };
   };
   constructor(props) {
     super(props);
     this.state = {
       person: {
-        name: props.navigation.getParam('name'),
+        displayName: props.navigation.getParam('displayName'),
         uid: props.navigation.getParam('uid'),
       },
       textMessage: '',
@@ -33,7 +33,8 @@ export default class Chat extends React.Component {
     const currentUser = firebase.auth().currentUser;
     User.uid = currentUser.uid;
     User.email = currentUser.email;
-    User.name = currentUser.name;
+    User.displayName = currentUser.displayName;
+    User.status = currentUser.status;
 
     firebase
       .database()
@@ -49,8 +50,8 @@ export default class Chat extends React.Component {
       });
   };
 
-  inputHandler = (name, value) => {
-    this.setState(() => ({[name]: value}));
+  inputHandler = (displayName, value) => {
+    this.setState(() => ({[displayName]: value}));
   };
 
   converTime = (time) => {

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 
 import firebase from 'firebase';
-import AsyncStorage from '@react-native-community/async-storage'
+import AsyncStorage from '@react-native-community/async-storage';
 import User from '../User';
 
 class Login extends React.Component {
@@ -23,32 +23,54 @@ class Login extends React.Component {
     isLoading: false,
   };
 
-  inputHandler = (name, value) => {
-    this.setState(() => ({[name]: value}));
+  inputHandler = (displayName, value) => {
+    this.setState(() => ({[displayName]: value}));
   };
 
   login = () => {
-    this.setState({isLoading:true})
+    this.setState({isLoading: true});
     if (
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.state.email)
     ) {
       if (this.state.password.length >= 8) {
         //////////////////////////////////////////////////////////////////////
-        firebase
+
+        let success = firebase
           .auth()
           .signInWithEmailAndPassword(this.state.email, this.state.password)
           .then(() => {
-            AsyncStorage.setItem('userEmail',this.state.email)
-            User.email = this.state.email;
-            
-
-            this.setState({isLoading:false})
+            success = true;
+            this.setState({isLoading: false});
             ToastAndroid.showWithGravity(
               'Have a Nice Conversation',
               ToastAndroid.SHORT,
               ToastAndroid.CENTER,
             );
             this.props.navigation.navigate('Home');
+            return true;
+          })
+          .then(success => {
+            if (success) {
+              const currentUser = firebase.auth().currentUser;
+              User.uid = currentUser.uid;
+              User.email = currentUser.email;
+              console.log(currentUser.displayName);
+              if (currentUser.displayName) {
+                User.displayName = currentUser.displayName;
+              } else {
+                User.displayName = currentUser.email;
+              }
+              User.status = 'online';
+
+              AsyncStorage.setItem('userEmail', User.email);
+              AsyncStorage.setItem('userDisplayName', User.displayName);
+              AsyncStorage.setItem('userUid', User.uid);
+
+              firebase
+                .database()
+                .ref('users/' + User.uid)
+                .set(User);
+            }
           })
           .catch(error => {
             this.setState({errorMessage: 'Wrong email or password'});
@@ -57,8 +79,10 @@ class Login extends React.Component {
               ToastAndroid.SHORT,
               ToastAndroid.CENTER,
             );
-            this.setState({isLoading:false})
+            this.setState({isLoading: false});
+            return false;
           });
+
         //////////////////////////////////////////////////////////////////////
       } else {
         ToastAndroid.showWithGravity(
@@ -66,7 +90,7 @@ class Login extends React.Component {
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
-        this.setState({isLoading:false})
+        this.setState({isLoading: false});
       }
     } else {
       ToastAndroid.showWithGravity(
@@ -74,7 +98,7 @@ class Login extends React.Component {
         ToastAndroid.SHORT,
         ToastAndroid.CENTER,
       );
-      this.setState({isLoading:false})
+      this.setState({isLoading: false});
     }
   };
 
@@ -86,41 +110,41 @@ class Login extends React.Component {
         </View>
       );
     } else {
-    return (
-      <View style={styles.container}>
-        <StatusBar backgroundColor="orange" barStyle="light-content" />
-        <View style={styles.logoContainer}>
-          <Image
-            style={{width: 50, height: 50}}
-            source={require('../images/logo.png')}
+      return (
+        <View style={styles.container}>
+          <StatusBar backgroundColor="orange" barStyle="light-content" />
+          <View style={styles.logoContainer}>
+            <Image
+              style={{width: 50, height: 50}}
+              source={require('../images/logo.png')}
+            />
+            <Text style={styles.logoText}>CONNECT</Text>
+          </View>
+
+          <TextInput
+            placeholder="email"
+            style={styles.input}
+            onChangeText={val => this.inputHandler('email', val)}
           />
-          <Text style={styles.logoText}>CONNECT</Text>
+
+          <TextInput
+            placeholder="password"
+            secureTextEntry={true}
+            style={styles.input}
+            onChangeText={val => this.inputHandler('password', val)}
+          />
+
+          <TouchableOpacity style={styles.loginButton} onPress={this.login}>
+            <Text style={styles.loginButtonText}>Login</Text>
+          </TouchableOpacity>
+
+          <Text>Don't have an account yet ?</Text>
+          <TouchableOpacity
+            onPress={() => this.props.navigation.navigate('Register')}>
+            <Text style={styles.toRegisterButton}>Register Here</Text>
+          </TouchableOpacity>
         </View>
-
-        <TextInput
-          placeholder="email"
-          style={styles.input}
-          onChangeText={val => this.inputHandler('email', val)}
-        />
-
-        <TextInput
-          placeholder="password"
-          secureTextEntry={true}
-          style={styles.input}
-          onChangeText={val => this.inputHandler('password', val)}
-        />
-
-        <TouchableOpacity style={styles.loginButton} onPress={this.login}>
-          <Text style={styles.loginButtonText}>Login</Text>
-        </TouchableOpacity>
-
-        <Text>Don't have an account yet ?</Text>
-        <TouchableOpacity
-          onPress={() => this.props.navigation.navigate('Register')}>
-          <Text style={styles.toRegisterButton}>Register Here</Text>
-        </TouchableOpacity>
-      </View>
-    );
+      );
     }
   }
 }

@@ -1,7 +1,8 @@
-const User = {
+let User = {
     uid:null,
     email: null,
-    name: null
+    displayName: null,
+    status: 'offline'
 }
 
 export default User;
