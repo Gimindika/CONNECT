@@ -10,7 +10,11 @@ export default class AppStateExample extends Component {
     appState: AppState.currentState,
   };
 
-  componentDidMount() {
+  componentDidMount = async () => {
+    User.email = await AsyncStorage.getItem('userEmail');
+    User.displayName = await AsyncStorage.getItem('userDisplayName');
+    User.uid = await AsyncStorage.getItem('userUid');
+    User.status = await AsyncStorage.getItem('userStatus');
     AppState.addEventListener('change', this._handleAppStateChange);
   }
 
@@ -62,6 +66,7 @@ export default class AppStateExample extends Component {
   };
 
   render() {
-    return <Text style={{backgroundColor:'orange', height:1, margin:0, padding:0}}></Text>;
+    // return <Text style={{backgroundColor:'orange', height:1, margin:0, padding:0}}></Text>;
+    return null
   }
 }

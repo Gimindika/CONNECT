@@ -21,6 +21,8 @@ export default class AuthLoadingScreen extends React.Component {
     User.uid = await AsyncStorage.getItem('userUid');
     User.status = await AsyncStorage.getItem('userStatus')
     this.props.navigation.navigate(User.email ? 'Home' : 'Login');
+    console.log('auth', User);
+    
   };
 
   // Render any loading content that you like here

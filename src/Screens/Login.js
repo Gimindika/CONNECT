@@ -67,8 +67,8 @@ class Login extends React.Component {
               AsyncStorage.setItem('userStatus', User.status);
               AsyncStorage.setItem('photoUrl', User.photoUrl)
               
-              console.log(User.displayName);
-
+              console.log(User, 'login');
+              
               firebase
                 .database()
                 .ref('users/' + User.uid)

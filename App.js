@@ -5,7 +5,9 @@ import AppState from './src/AppState';
 import firebase from 'firebase';
 import firebasekey from './firebasekey';
 
-import ImgPicker from './src/Screens/ImgPicker';
+// import ImgPicker1 from './src/Screens/ImgPicker1';
+
+
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
@@ -25,11 +27,11 @@ firebase.initializeApp(firebaseConfig);
 const App = () => {
 
   return (
-    <ImgPicker/>
-  // <React.Fragment>
-  //   <Router />
-  //   <AppState/>
-  // </React.Fragment>  
+    // <ImgPicker1/>
+  <React.Fragment>
+    <Router />
+    <AppState/>
+  </React.Fragment>  
   );
 };
 

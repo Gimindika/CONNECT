@@ -124,7 +124,7 @@ export default class Chat extends React.Component {
   render() {
     const {height, width} = Dimensions.get('window');
     return (
-      <SafeAreaView>
+      <SafeAreaView style={{height:"100%"}}>
         <FlatList
           style={{padding: 10, height: height * 0.8}}
           data={this.state.messageList}
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FFB449',
     width: '80%',
-    marginBottom: 10,
+
     backgroundColor: '#fff',
     borderRadius: 10,
   },
@@ -171,5 +171,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
+ 
   },
 });
