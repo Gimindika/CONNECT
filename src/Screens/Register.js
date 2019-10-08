@@ -23,8 +23,8 @@ class Register extends React.Component {
     isLoading: false,
   };
 
-  inputHandler = (displayName, value) => {
-    this.setState(() => ({[displayName]: value}));
+  inputHandler = (name, value) => {
+    this.setState(() => ({[name]: value}));
   };
 
   register = () => {
@@ -50,7 +50,8 @@ class Register extends React.Component {
                 User.uid = currentUser.uid
                 User.email = currentUser.email
                 User.displayName = currentUser.email,
-                User.status = 'online'
+                User.status = 'online',
+                User.photoUrl = 'https://res.cloudinary.com/gimindika/image/upload/v1570517127/user-icon-png-person-user-profile-icon-20_ogs0mj.png'
                
                 ToastAndroid.showWithGravity(
                   'Register success, welcome to CONNECT.',

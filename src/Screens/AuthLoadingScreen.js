@@ -19,6 +19,7 @@ export default class AuthLoadingScreen extends React.Component {
     User.email = await AsyncStorage.getItem('userEmail');
     User.displayName = await AsyncStorage.getItem('userDisplayName');
     User.uid = await AsyncStorage.getItem('userUid');
+    User.status = await AsyncStorage.getItem('userStatus')
     this.props.navigation.navigate(User.email ? 'Home' : 'Login');
   };
 

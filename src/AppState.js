@@ -25,7 +25,7 @@ export default class AppStateExample extends Component {
       nextAppState === 'active'
     ) {
       if(User.uid){
-      
+        
         firebase
           .database()
           .ref('users/' + User.uid)
@@ -33,6 +33,7 @@ export default class AppStateExample extends Component {
             ...User,
             status:'online'
           });
+          User.status = 'online'
       }
 
       console.log('App has come to the foreground!');
@@ -51,6 +52,7 @@ export default class AppStateExample extends Component {
             ...User,
             status:'offline'
           });
+          User.status ='offline'
       }
 
       console.log('App has come to the background!');
@@ -60,6 +62,6 @@ export default class AppStateExample extends Component {
   };
 
   render() {
-    return <Text style={{backgroundColor:'orange'}}></Text>;
+    return <Text style={{backgroundColor:'orange', height:1, margin:0, padding:0}}></Text>;
   }
 }

@@ -23,8 +23,8 @@ class Login extends React.Component {
     isLoading: false,
   };
 
-  inputHandler = (displayName, value) => {
-    this.setState(() => ({[displayName]: value}));
+  inputHandler = (name, value) => {
+    this.setState(() => ({[name]: value}));
   };
 
   login = () => {
@@ -54,17 +54,20 @@ class Login extends React.Component {
               const currentUser = firebase.auth().currentUser;
               User.uid = currentUser.uid;
               User.email = currentUser.email;
-              console.log(currentUser.displayName);
               if (currentUser.displayName) {
                 User.displayName = currentUser.displayName;
               } else {
                 User.displayName = currentUser.email;
               }
               User.status = 'online';
-
+              
               AsyncStorage.setItem('userEmail', User.email);
               AsyncStorage.setItem('userDisplayName', User.displayName);
               AsyncStorage.setItem('userUid', User.uid);
+              AsyncStorage.setItem('userStatus', User.status);
+              AsyncStorage.setItem('photoUrl', User.photoUrl)
+              
+              console.log(User.displayName);
 
               firebase
                 .database()

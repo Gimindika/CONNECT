@@ -32,9 +32,6 @@ export default class Chat extends React.Component {
   componentDidMount = () => {
     const currentUser = firebase.auth().currentUser;
     User.uid = currentUser.uid;
-    User.email = currentUser.email;
-    User.displayName = currentUser.displayName;
-    User.status = currentUser.status;
 
     firebase
       .database()
@@ -48,23 +45,24 @@ export default class Chat extends React.Component {
           };
         });
       });
+    console.log(User, 'chat');
   };
 
   inputHandler = (displayName, value) => {
     this.setState(() => ({[displayName]: value}));
   };
 
-  converTime = (time) => {
-      let record = new Date(time);
-      let current = new Date();
-      let result = (record.getHours() < 10 ? '0' : '') + record.getHours() + ':';
-      result += (record.getMinutes() < 10 ? '0' : '') + record.getMinutes();
-      if(current.getDay() !== record.getDay()){
-          result = record.getDay() + ' ' + record.getMonth() + ' ' + result;
-      }
-      return result;
-  }
- 
+  converTime = time => {
+    let record = new Date(time);
+    let current = new Date();
+    let result = (record.getHours() < 10 ? '0' : '') + record.getHours() + ':';
+    result += (record.getMinutes() < 10 ? '0' : '') + record.getMinutes();
+    if (current.getDay() !== record.getDay()) {
+      result = record.getDay() + ' ' + record.getMonth() + ' ' + result;
+    }
+    return result;
+  };
+
   sendMessage = async () => {
     if (this.state.textMessage.length > 0) {
       let msgId = firebase
@@ -110,7 +108,13 @@ export default class Chat extends React.Component {
         <Text style={{color: '#000', padding: 7, fontSize: 16}}>
           {item.message}
         </Text>
-        <Text style={{color: '#aaa', padding: 3, fontSize: 12, alignSelf:'flex-end'}}>
+        <Text
+          style={{
+            color: '#aaa',
+            padding: 3,
+            fontSize: 12,
+            alignSelf: 'flex-end',
+          }}>
           {this.converTime(item.time)}
         </Text>
       </View>
