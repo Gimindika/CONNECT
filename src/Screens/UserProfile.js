@@ -29,21 +29,42 @@ class UserProfile extends React.Component {
     this.state = {
       user: {
         displayName: props.navigation.getParam('displayName'),
+        uid: props.navigation.getParam('uid'),
         email: props.navigation.getParam('email'),
         photoUrl: props.navigation.getParam('photoUrl'),
-        status: props.navigation.getParam('status'),
+        // status: props.navigation.getParam('status'),
+        longitude: props.navigation.getParam('longitude'),
+        latitude: props.navigation.getParam('latitude'),
+
       },
       textMessage: '',
       messageList: [],
     };
   }
 
-  logout = () => {
+  logout = async () => {
+    User.email = await AsyncStorage.getItem('userEmail');
+    User.displayName = await AsyncStorage.getItem('userDisplayName');
+    User.uid = await AsyncStorage.getItem('userUid');
+    User.status = await AsyncStorage.getItem('userStatus');
+    User.longitude = await AsyncStorage.getItem('longitude');
+    User.latitude = await AsyncStorage.getItem('latitude');
+
+    //handling bug, where sometimes user.email is null/////////////////////////////
+    if(!this.state.user.email){
+      this.setState({user:{
+        ...this.state.user,
+        email:User.email
+      }})
+    }
+    console.log(this.state.user, 'logout');
+    ///////////////////////////////////////////////////////////////////////////////
+    
     firebase
       .database()
       .ref('users/' + User.uid)
       .set({
-        ...User,
+        ...this.state.user,
         status: 'offline',
       });
     AsyncStorage.removeItem('userEmail');
@@ -51,6 +72,8 @@ class UserProfile extends React.Component {
     AsyncStorage.removeItem('userUid');
     AsyncStorage.removeItem('userStatus');
     AsyncStorage.removeItem('photoUrl');
+    AsyncStorage.removeItem('latitude');
+    AsyncStorage.removeItem('longitude');
     // User.uid = null;
     // User.email = null;
     // User.displayName = null;
@@ -80,24 +103,39 @@ class UserProfile extends React.Component {
             {this.state.user.displayName}
           </Text>
           {this.state.user.status == 'online' ? (
-              <Text style={{...styles.statusLabel, color: 'green'}}>
-                {this.state.user.status}
-              </Text>
-            ) : (
-              <Text style={{...styles.statusLabel}}>{this.state.user.status}</Text>
-            )}
+            <Text style={{...styles.statusLabel, color: 'green'}}>
+              {this.state.user.status}
+            </Text>
+          ) : (
+            <Text style={{...styles.statusLabel}}>
+              {this.state.user.status}
+            </Text>
+          )}
           <Text style={styles.profileLabel}>
             {'Email : ' + this.state.user.email}
           </Text>
           <View
             style={{
               ...styles.profileContainer,
+              marginTop: 50,
+              flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <TouchableOpacity style={styles.logoutButton} onPress={this.logout}>
-              <Text style={{...styles.logoutLabel}}>Logout</Text>
-            </TouchableOpacity>
+            {this.state.user.uid == User.uid ? (
+              <React.Fragment>
+                <TouchableOpacity
+                  style={{...styles.logoutButton, backgroundColor: 'orange'}}>
+                  <Text style={{...styles.logoutLabel}}>Edit</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.logoutButton}
+                  onPress={this.logout}>
+                  <Text style={{...styles.logoutLabel}}>Logout</Text>
+                </TouchableOpacity>
+              </React.Fragment>
+            ) : null}
           </View>
         </View>
       </View>
@@ -141,11 +179,12 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     borderRadius: 10,
-    backgroundColor: 'orange',
+    backgroundColor: 'red',
     width: 100,
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
+    marginHorizontal: '5%',
     // marginVertical:'10%'
   },
   logoutLabel: {

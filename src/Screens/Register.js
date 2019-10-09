@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import firebase from 'firebase';
 import User from '../User';
+import geolocation from '@react-native-community/geolocation';
 
 class Register extends React.Component {
   state = {
@@ -20,6 +21,7 @@ class Register extends React.Component {
     password: '',
     verifyPassword: '',
 
+    location: {},
     isLoading: false,
   };
 
@@ -28,6 +30,17 @@ class Register extends React.Component {
   };
 
   register = () => {
+    geolocation.getCurrentPosition(
+      position => {
+        let location = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        };
+        this.setState({location: location});
+      },
+      error => console.log(error),
+    );
+
     this.setState({isLoading: true});
     if (
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.state.email)
@@ -45,31 +58,36 @@ class Register extends React.Component {
               .then(() => {
                 this.setState({isLoading: false});
 
-                firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password);
+                firebase
+                  .auth()
+                  .signInWithEmailAndPassword(
+                    this.state.email,
+                    this.state.password,
+                  );
                 currentUser = firebase.auth().currentUser;
-                User.uid = currentUser.uid
-                User.email = currentUser.email
-                User.displayName = currentUser.email,
-                User.status = 'online',
-                User.photoUrl = 'https://res.cloudinary.com/gimindika/image/upload/v1570517127/user-icon-png-person-user-profile-icon-20_ogs0mj.png'
-               
+                User.uid = currentUser.uid;
+                User.email = currentUser.email;
+                User.displayName = currentUser.email;
+                User.status = 'online';
+                User.photoUrl =
+                  'https://res.cloudinary.com/gimindika/image/upload/v1570517127/user-icon-png-person-user-profile-icon-20_ogs0mj.png';
+                User.latitude = this.state.location.latitude;
+                User.longitude = this.state.location.longitude;
+
                 ToastAndroid.showWithGravity(
                   'Register success, welcome to CONNECT.',
                   ToastAndroid.SHORT,
                   ToastAndroid.CENTER,
                 );
-              
-                
+
                 firebase
                   .database()
                   .ref('users/' + User.uid)
-                  .set(User).then(
-                    console.log('success', 'users/' + User.uid)
-                    
-                  ).catch(error => console.log(error)
-                  )
-                
-                  this.props.navigation.navigate('Home');
+                  .set(User)
+                  .then()
+                  .catch(error => console.log(error));
+
+                this.props.navigation.navigate('Home');
               })
               .catch(error => this.setState({errorMessage: error.message}));
 

@@ -14,12 +14,15 @@ import {
 import firebase from 'firebase';
 import AsyncStorage from '@react-native-community/async-storage';
 import User from '../User';
+import geolocation from '@react-native-community/geolocation';
+
 
 class Login extends React.Component {
   state = {
     email: '',
     password: '',
 
+    location: {},
     isLoading: false,
   };
 
@@ -28,6 +31,18 @@ class Login extends React.Component {
   };
 
   login = () => {
+    geolocation.getCurrentPosition(
+      position => {
+        let location = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+  
+        };
+        this.setState({location: location});
+      },
+      error => console.log(error),
+    );
+
     this.setState({isLoading: true});
     if (
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.state.email)
@@ -51,6 +66,8 @@ class Login extends React.Component {
           })
           .then(success => {
             if (success) {
+              
+
               const currentUser = firebase.auth().currentUser;
               User.uid = currentUser.uid;
               User.email = currentUser.email;
@@ -60,14 +77,18 @@ class Login extends React.Component {
                 User.displayName = currentUser.email;
               }
               User.status = 'online';
+              User.latitude = this.state.location.latitude
+              User.longitude = this.state.location.longitude
+              console.log(User, 'login');
               
               AsyncStorage.setItem('userEmail', User.email);
               AsyncStorage.setItem('userDisplayName', User.displayName);
               AsyncStorage.setItem('userUid', User.uid);
               AsyncStorage.setItem('userStatus', User.status);
-              AsyncStorage.setItem('photoUrl', User.photoUrl)
+              AsyncStorage.setItem('photoUrl', User.photoUrl);
+              AsyncStorage.setItem('latitude', User.latitude);
+              AsyncStorage.setItem('longitude', User.longitude);
               
-              console.log(User, 'login');
               
               firebase
                 .database()

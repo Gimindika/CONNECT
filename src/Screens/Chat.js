@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+ 
 } from 'react-native';
 import User from '../User';
 import firebase from 'firebase';
@@ -58,7 +59,7 @@ export default class Chat extends React.Component {
     let result = (record.getHours() < 10 ? '0' : '') + record.getHours() + ':';
     result += (record.getMinutes() < 10 ? '0' : '') + record.getMinutes();
     if (current.getDay() !== record.getDay()) {
-      result = record.getDay() + ' ' + record.getMonth() + ' ' + result;
+      result = record.getDay() + '/' + record.getMonth() + ' ' + result;
     }
     return result;
   };
@@ -143,6 +144,7 @@ export default class Chat extends React.Component {
             <Text>Send</Text>
           </TouchableOpacity>
         </View>
+       
       </SafeAreaView>
     );
   }

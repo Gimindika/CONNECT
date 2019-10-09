@@ -8,6 +8,7 @@ import {
   View,
   Button,
   Image,
+  Dimensions,
 } from 'react-native';
 import firebase from 'firebase';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -25,37 +26,27 @@ class Home extends React.Component {
     return {
       title: 'User List',
       headerRight: (
-        // <Button
-        //   title="Profile"
-        //   color="orange"
-        //   onPress={() =>
-        //     navigation.navigate('UserProfile', {
-        //       uid: User.uid,
-        //       displayName: User.displayName,
-        //       email: User.email,
-        //       status: User.status,
-        //       photoUrl: User.photoUrl,
-        //     })
-        //   }
-        // />
+      
 
         <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('UserProfile', {
-                uid: User.uid,
-                displayName: User.displayName,
-                email: User.email,
-                status: User.status,
-                photoUrl: User.photoUrl,
-              })
-            }>
-            <Image
-              style={styles.userPhoto}
-              source={{
-                uri: User.photoUrl,
-              }}
-            />
-          </TouchableOpacity>
+          onPress={() =>
+            navigation.navigate('UserProfile', {
+              uid: User.uid,
+              displayName: User.displayName,
+              email: User.email,
+              status: User.status,
+              photoUrl: User.photoUrl,
+              latitude:User.latitude,
+              longitude:User.longitude
+            })
+          }>
+          <Image
+            style={styles.userPhoto}
+            source={{
+              uri: User.photoUrl,
+            }}
+          />
+        </TouchableOpacity>
       ),
     };
   };
@@ -70,20 +61,19 @@ class Home extends React.Component {
     await dbRef.on('child_added', async val => {
       let person = val.val();
       person.uid = val.key;
-      console.log(val.val(), 'home');
-      console.log(User.displayName);
+     
 
       if (person.uid == User.uid) {
         person.displayName = User.displayName;
-        console.log(User.displayName, 'same');
+      
 
         // User.displayName = person.displayName;
       } else {
-        console.log(person, 'not');
+     
         await this.setState({
           users: [...this.state.users, person],
         });
-        console.log(this.state.users, 'state');
+      
       }
     });
   };
@@ -91,7 +81,12 @@ class Home extends React.Component {
   renderRow = ({item}) => {
     return (
       <React.Fragment>
-        <View style={{...styles.userList,flexDirection: 'row', marginHorizontal: 10}}>
+        <View
+          style={{
+            ...styles.userList,
+            flexDirection: 'row',
+            marginHorizontal: 10,
+          }}>
           <TouchableOpacity
             onPress={() =>
               this.props.navigation.navigate('UserProfile', {
@@ -111,7 +106,6 @@ class Home extends React.Component {
           </TouchableOpacity>
           <TouchableOpacity
             key={item.uid}
-          
             onPress={() => {
               this.props.navigation.navigate('Chat', {
                 uid: item.uid,
@@ -138,15 +132,31 @@ class Home extends React.Component {
   };
 
   render() {
+    const {height, width} = Dimensions.get('window');
     return (
       <SafeAreaView>
-        <StatusBar backgroundColor="orange" barStyle="light-content" />
+        <View style={{height: height * 0.80}}>
+          <StatusBar backgroundColor="orange" barStyle="light-content" />
 
-        <FlatList
-          data={this.state.users}
-          renderItem={this.renderRow}
-          keyExtractor={item => item.uid}
-        />
+          <FlatList
+            data={this.state.users}
+            renderItem={this.renderRow}
+            keyExtractor={item => item.uid}
+          />
+        </View>
+       
+        <TouchableOpacity
+          style={{
+            backgroundColor: 'orange',
+            width: width,
+            height: height * 0.09,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onPress={() => this.props.navigation.navigate('Maps', {users:this.state.users})}
+          >
+          <Text style={{fontSize: 20}}>Maps</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
