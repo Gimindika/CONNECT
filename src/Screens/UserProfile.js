@@ -134,10 +134,10 @@ class UserProfile extends React.Component {
             }}>
             {this.state.user.uid == User.uid ? (
               <React.Fragment>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   style={{...styles.logoutButton, backgroundColor: 'orange'}}>
                   <Text style={{...styles.logoutLabel}}>Edit</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <TouchableOpacity
                   style={styles.logoutButton}

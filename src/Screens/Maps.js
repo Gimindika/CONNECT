@@ -28,7 +28,10 @@ export default class Maps extends React.Component {
     this.state = {
       location: {},
       users: [],
+    
     };
+
+    this.getUsers();
   }
 
   static navigationOptions = () => {
@@ -53,15 +56,44 @@ export default class Maps extends React.Component {
 
     // this.setState({users: this.props.navigation.getParam('users')});
 
+    // let dbRef = firebase.database().ref('users');
+    // // await dbRef.on('child_added', async val => {
+    // const temp = await dbRef.on('child_added', async val => { 
+    //   let person = val.val();
+    //   person.uid = val.key;
+      
+    //   if (person.uid == User.uid) {
+    //     person.displayName = User.displayName;
+        
+    //     // User.displayName = person.displayName;
+    //   } else {
+    //     let tmp = this.state.users;
+    //     tmp.push(person);
+    //     await this.setState({
+    //       users: tmp,
+    //     });
+    //     {console.log( this.state.users.length,'marker aaa')}
+    //   }
+    //   return this.state.users
+    // });
+    // {console.log( this.state.users.length,'marker atas')}
+   
+    
+    // User.longitude = await AsyncStorage.getItem('longitude');
+    // User.latitude = await AsyncStorage.getItem('latitude');
+    
+  };
+
+  getUsers = async () => {
     let dbRef = firebase.database().ref('users');
     // await dbRef.on('child_added', async val => {
-    await dbRef.on('child_added', async val => {
+    const temp = await dbRef.on('child_added', async val => { 
       let person = val.val();
       person.uid = val.key;
-
+      
       if (person.uid == User.uid) {
         person.displayName = User.displayName;
-
+        
         // User.displayName = person.displayName;
       } else {
         let tmp = this.state.users;
@@ -69,14 +101,19 @@ export default class Maps extends React.Component {
         await this.setState({
           users: tmp,
         });
+        // {console.log( this.state.users.length,'marker aaa')}
       }
+      return this.state.users
     });
 
-    // User.longitude = await AsyncStorage.getItem('longitude');
-    // User.latitude = await AsyncStorage.getItem('latitude');
-  };
-
+    // {console.log( this.state.users,'marker atas')}
+  }
+  
+  
   render() {
+    
+
+    {console.log( this.state.users.length,'marker atas')}
     if (this.state.users.length == 0) {
       return (
         <View style={styles.container}>
@@ -85,9 +122,11 @@ export default class Maps extends React.Component {
         </View>
       );
     } else {
-      const {height, width} = Dimensions.get('window');
+      // const {height, width} = Dimensions.get('window');
+
       return (
         <View>
+
           <StatusBar backgroundColor="orange" barStyle="light-content" />
           <MapView
             style={{width: '100%', height: '100%'}}
@@ -97,7 +136,7 @@ export default class Maps extends React.Component {
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421,
             }}
-            // provider={PROVIDER_GOOGLE}
+            
             showsUserLocation={true}
             followUserLocation={true}
             zoomControlEnabled={true}
@@ -112,44 +151,10 @@ export default class Maps extends React.Component {
             showsCompass={true}
             showsPointsOfInterest={false}
             provider="google">
-            {/* <MapView.Marker
-              coordinate={{
-                latitude: User.latitude || 0,
-                longitude: User.longitude || 0,
-              }}>
-              {console.log(User.latitude, 'mapstateuser')}
-
-              <View style={styles.mapCoor}>
-                <Image
-                  source={{
-                    uri: User.photoUrl,
-                  }}
-                  style={styles.image}
-                />
-              </View>
-              <Text style={styles.name}>{User.displayName}</Text>
-            </MapView.Marker> */}
-            {/* {console.log(this.state.users.length,'map')} */}
-            {/* {this.state.users.map((item, index) => {
-              <React.Fragment>
-             
-              <MapView.Marker
-                key={index}
-                coordinate={{
-                  latitude: item.latitude || 0,
-                  longitude: item.longitude || 0,
-                }}>
-                {console.log(item.latitude, 'mapstate')}
-                <View style={styles.mapCoor}>
-                  <Image source={{uri: item.image}} style={styles.image} />
-                </View>
-                <Text style={styles.name}>{item.name}</Text>
-              </MapView.Marker>;
-              </React.Fragment>
-              // );
-            })} */}
+           
             
             {this.state.users.map(item => {
+           
               return (
                 <Marker
                   draggable
@@ -168,23 +173,24 @@ export default class Maps extends React.Component {
                       longitude: item.longitude,
                     });
                   }}>
+
                     <View style={styles.mapCoor}>
-                    {console.log(item.latitude, 'mapstate')}
+                    {/* {console.log(item.latitude, 'mapstate')} */}
+                    {/* {console.log( item.displayName,'marker show')} */}
+                    {/* {console.log( this.state.users.length,'marker show')} */}
+
+
                   <Image
                     source={{uri: item.photoUrl}}
-                    // style={{
-                    //   height: 20,
-                    //   width: 20,
-                    //   alignContent: 'center',
-                    //   borderRadius: 10,
-                    // }}
+                    
                     style={styles.image}
                   />
                   </View>
                   <Text style={{textAlign: 'center'}}>{item.displayName}</Text>
                 </Marker>
               )
-            })}
+            })
+            }
            
           </MapView>
         </View>
