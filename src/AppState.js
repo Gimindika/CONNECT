@@ -11,6 +11,12 @@ export default class AppStateExample extends Component {
   };
 
   componentDidMount = async () => {
+    User.uid = await AsyncStorage.getItem('userUid');
+    User.email = await AsyncStorage.getItem('userEmail');
+    User.displayName = await AsyncStorage.getItem('userDisplayName');
+    // User.status = await AsyncStorage.getItem('userStatus');
+   
+    console.log(await AsyncStorage.getItem('latitude'),'asdasdas');
     
     AppState.addEventListener('change', this._handleAppStateChange);
   }
@@ -24,10 +30,10 @@ export default class AppStateExample extends Component {
     User.uid = await AsyncStorage.getItem('userUid');
     User.email = await AsyncStorage.getItem('userEmail');
     User.displayName = await AsyncStorage.getItem('userDisplayName');
-  
     // User.status = await AsyncStorage.getItem('userStatus');
-    User.longitude = await AsyncStorage.getItem('longitude');
-    User.latitude = await AsyncStorage.getItem('latitude');
+    
+    console.log(User, 'AppState');
+    
     if (
       this.state.appState.match(/inactive|background/) &&
       nextAppState === 'active'

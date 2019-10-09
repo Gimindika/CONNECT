@@ -42,24 +42,31 @@ class UserProfile extends React.Component {
     };
   }
 
-  logout = async () => {
+  componentDidMount = async () => {
     User.email = await AsyncStorage.getItem('userEmail');
     User.displayName = await AsyncStorage.getItem('userDisplayName');
     User.uid = await AsyncStorage.getItem('userUid');
     User.status = await AsyncStorage.getItem('userStatus');
     User.longitude = await AsyncStorage.getItem('longitude');
     User.latitude = await AsyncStorage.getItem('latitude');
-
-    //handling bug, where sometimes user.email is null/////////////////////////////
-    if(!this.state.user.email){
+     //handling bug, where sometimes user.email is null/////////////////////////////
+     if(!this.state.user.email){
       this.setState({user:{
         ...this.state.user,
-        email:User.email
+        email:User.email,
       }})
     }
-    console.log(this.state.user, 'logout');
-    ///////////////////////////////////////////////////////////////////////////////
+    console.log(this.state.user.longitude,' ', User.longitude);
     
+    ///////////////////////////////////////////////////////////////////////////////
+  }
+  
+  logout =  () => {
+    
+    console.log(this.state.user, 'logout');
+
+   
+
     firebase
       .database()
       .ref('users/' + User.uid)

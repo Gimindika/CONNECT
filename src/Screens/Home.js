@@ -26,20 +26,20 @@ class Home extends React.Component {
     return {
       title: 'User List',
       headerRight: (
-      
-
+        
         <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('UserProfile', {
-              uid: User.uid,
-              displayName: User.displayName,
-              email: User.email,
-              status: User.status,
-              photoUrl: User.photoUrl,
-              latitude:User.latitude,
-              longitude:User.longitude
-            })
+        onPress={() =>
+          navigation.navigate('UserProfile', {
+            uid: User.uid,
+            displayName: User.displayName,
+            email: User.email,
+            status: User.status,
+            photoUrl: User.photoUrl,
+            latitude:User.latitude,
+            longitude:User.longitude
+          })
           }>
+            
           <Image
             style={styles.userPhoto}
             source={{
@@ -52,28 +52,35 @@ class Home extends React.Component {
   };
 
   componentDidMount = async () => {
-    User.email = await AsyncStorage.getItem('userEmail');
-    User.displayName = await AsyncStorage.getItem('userDisplayName');
-    User.uid = await AsyncStorage.getItem('userUid');
-    User.status = await AsyncStorage.getItem('userStatus');
+    // User.email = await AsyncStorage.getItem('userEmail');
+    // User.displayName = await AsyncStorage.getItem('userDisplayName');
+    // User.uid = await AsyncStorage.getItem('userUid');
+    // User.status = await AsyncStorage.getItem('userStatus');
+    // User.longitude = await AsyncStorage.getItem('longitude');
+    // User.latitude = await AsyncStorage.getItem('latitude');
+    // User = props.navigation.getParam('User')
+    
 
     let dbRef = firebase.database().ref('users');
+    // await dbRef.on('child_added', async val => {
     await dbRef.on('child_added', async val => {
+
       let person = val.val();
       person.uid = val.key;
-     
-
+      
       if (person.uid == User.uid) {
         person.displayName = User.displayName;
-      
-
+        
         // User.displayName = person.displayName;
       } else {
-     
+        let tmp = this.state.users;
+        tmp.push(person)
         await this.setState({
-          users: [...this.state.users, person],
+          users: tmp,
         });
-      
+        console.log('/////////////////////////////////////////////////////////////////////////')
+        console.log(person.uid,' homek ', User.uid, ' asda ', person );
+        
       }
     });
   };
@@ -95,6 +102,8 @@ class Home extends React.Component {
                 email: item.email,
                 status: item.status,
                 photoUrl: item.photoUrl,
+                latitude:item.latitude,
+                longitude:item.longitude
               })
             }>
             <Image

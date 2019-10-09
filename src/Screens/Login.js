@@ -61,7 +61,6 @@ class Login extends React.Component {
               ToastAndroid.SHORT,
               ToastAndroid.CENTER,
             );
-            this.props.navigation.navigate('Home');
             return true;
           })
           .then(success => {
@@ -79,7 +78,7 @@ class Login extends React.Component {
               User.status = 'online';
               User.latitude = this.state.location.latitude
               User.longitude = this.state.location.longitude
-              console.log(User, 'login');
+           
               
               AsyncStorage.setItem('userEmail', User.email);
               AsyncStorage.setItem('userDisplayName', User.displayName);
@@ -90,10 +89,14 @@ class Login extends React.Component {
               AsyncStorage.setItem('longitude', User.longitude);
               
               
+              
               firebase
                 .database()
                 .ref('users/' + User.uid)
                 .set(User);
+
+            this.props.navigation.navigate('Home');
+
             }
           })
           .catch(error => {
