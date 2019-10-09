@@ -17,11 +17,10 @@ import {
 import firebase from 'firebase';
 import User from '../User';
 
-import MapView, {Marker} from 'react-native-maps';
+import MapView, { Marker} from 'react-native-maps';
 import geolocation from '@react-native-community/geolocation';
 
 import AsyncStorage from '@react-native-community/async-storage';
-
 
 export default class Maps extends React.Component {
   constructor(props) {
@@ -57,17 +56,16 @@ export default class Maps extends React.Component {
     let dbRef = firebase.database().ref('users');
     // await dbRef.on('child_added', async val => {
     await dbRef.on('child_added', async val => {
-
       let person = val.val();
       person.uid = val.key;
-      
+
       if (person.uid == User.uid) {
         person.displayName = User.displayName;
-        
+
         // User.displayName = person.displayName;
       } else {
         let tmp = this.state.users;
-        tmp.push(person)
+        tmp.push(person);
         await this.setState({
           users: tmp,
         });
@@ -76,9 +74,7 @@ export default class Maps extends React.Component {
 
     // User.longitude = await AsyncStorage.getItem('longitude');
     // User.latitude = await AsyncStorage.getItem('latitude');
-    
   };
-
 
   render() {
     if (this.state.users.length == 0) {
@@ -101,14 +97,27 @@ export default class Maps extends React.Component {
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421,
             }}
+            // provider={PROVIDER_GOOGLE}
             showsUserLocation={true}
-          />
-          <Marker
+            followUserLocation={true}
+            zoomControlEnabled={true}
+            showsCompass={true}
+            minZoomLevel={0} // default => 0
+            maxZoomLevel={20}
+            loadingEnabled={true}
+            loadingIndicatorColor="#666666"
+            loadingBackgroundColor="#eeeeee"
+            moveOnMarkerPress={false}
+            showsUserLocation={true}
+            showsCompass={true}
+            showsPointsOfInterest={false}
+            provider="google">
+            {/* <MapView.Marker
               coordinate={{
                 latitude: User.latitude || 0,
                 longitude: User.longitude || 0,
               }}>
-                     {console.log(User.latitude, 'mapstateuser')}
+              {console.log(User.latitude, 'mapstateuser')}
 
               <View style={styles.mapCoor}>
                 <Image
@@ -119,27 +128,65 @@ export default class Maps extends React.Component {
                 />
               </View>
               <Text style={styles.name}>{User.displayName}</Text>
-            </Marker>
-          {/* {console.log(this.state.users.length,'map')} */}
-          {this.state.users.map((item, index) => {
-             return (
-                // this.renderMarker(item,index)
+            </MapView.Marker> */}
+            {/* {console.log(this.state.users.length,'map')} */}
+            {/* {this.state.users.map((item, index) => {
+              <React.Fragment>
+             
+              <MapView.Marker
+                key={index}
+                coordinate={{
+                  latitude: item.latitude || 0,
+                  longitude: item.longitude || 0,
+                }}>
+                {console.log(item.latitude, 'mapstate')}
+                <View style={styles.mapCoor}>
+                  <Image source={{uri: item.image}} style={styles.image} />
+                </View>
+                <Text style={styles.name}>{item.name}</Text>
+              </MapView.Marker>;
+              </React.Fragment>
+              // );
+            })} */}
+            
+            {this.state.users.map(item => {
+              return (
                 <Marker
-                  key={index}
+                  draggable
                   coordinate={{
-                    latitude: item.latitude || 0,
-                    longitude: item.longitude || 0,
+                    latitude: item.latitude,
+                    longitude: item.longitude,
+                  }}
+                  onPress={() => {
+                    this.props.navigation.navigate('UserProfile', {
+                      displayName: item.displayName,
+                      photoUrl: item.photoUrl,
+                      email: item.email,
+                      uid: item.uid,
+                      status: item.status,
+                      latitude: item.latitude,
+                      longitude: item.longitude,
+                    });
                   }}>
-                     {console.log(item.latitude, 'mapstate')}
-                  <View style={styles.mapCoor}>
-                    <Image source={{uri: item.image}} style={styles.image} />
+                    <View style={styles.mapCoor}>
+                    {console.log(item.latitude, 'mapstate')}
+                  <Image
+                    source={{uri: item.photoUrl}}
+                    // style={{
+                    //   height: 20,
+                    //   width: 20,
+                    //   alignContent: 'center',
+                    //   borderRadius: 10,
+                    // }}
+                    style={styles.image}
+                  />
                   </View>
-                  <Text style={styles.name}>{item.name}</Text>
+                  <Text style={{textAlign: 'center'}}>{item.displayName}</Text>
                 </Marker>
-              
-            );
-          })}
-          {/* </MapView> */}
+              )
+            })}
+           
+          </MapView>
         </View>
       );
     }

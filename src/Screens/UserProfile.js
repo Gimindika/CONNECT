@@ -35,7 +35,6 @@ class UserProfile extends React.Component {
         // status: props.navigation.getParam('status'),
         longitude: props.navigation.getParam('longitude'),
         latitude: props.navigation.getParam('latitude'),
-
       },
       textMessage: '',
       messageList: [],
@@ -47,25 +46,23 @@ class UserProfile extends React.Component {
     User.displayName = await AsyncStorage.getItem('userDisplayName');
     User.uid = await AsyncStorage.getItem('userUid');
     User.status = await AsyncStorage.getItem('userStatus');
-    User.longitude = await AsyncStorage.getItem('longitude');
-    User.latitude = await AsyncStorage.getItem('latitude');
-     //handling bug, where sometimes user.email is null/////////////////////////////
-     if(!this.state.user.email){
-      this.setState({user:{
-        ...this.state.user,
-        email:User.email,
-      }})
+    // User.longitude = await AsyncStorage.getItem('longitude');
+    // User.latitude = await AsyncStorage.getItem('latitude');
+    //handling bug, where sometimes user.email is null/////////////////////////////
+    if (!this.state.user.email) {
+      this.setState({
+        user: {
+          ...this.state.user,
+          email: User.email,
+        },
+      });
     }
-    console.log(this.state.user.longitude,' ', User.longitude);
-    
-    ///////////////////////////////////////////////////////////////////////////////
-  }
-  
-  logout =  () => {
-    
-    console.log(this.state.user, 'logout');
-
+    console.log(this.state.user.longitude, ' ', User.longitude);
    
+  };
+
+  logout = () => {
+    console.log(this.state.user, 'logout');
 
     firebase
       .database()
@@ -92,6 +89,8 @@ class UserProfile extends React.Component {
   };
 
   render() {
+   
+
     const {height, width} = Dimensions.get('window');
     return (
       <View style={styles.container}>
@@ -121,6 +120,10 @@ class UserProfile extends React.Component {
           <Text style={styles.profileLabel}>
             {'Email : ' + this.state.user.email}
           </Text>
+
+          <View style={styles.conAdd}>
+            <Text style={styles.address}> {this.state.address}</Text>
+          </View>
           <View
             style={{
               ...styles.profileContainer,
@@ -143,6 +146,24 @@ class UserProfile extends React.Component {
                 </TouchableOpacity>
               </React.Fragment>
             ) : null}
+            {this.state.user.uid != User.uid ? (
+              <React.Fragment>
+                <TouchableOpacity
+                  style={{...styles.logoutButton, backgroundColor: 'orange'}}
+                  onPress={() => {
+                    this.props.navigation.navigate('Chat', {
+                      uid: this.state.user.uid,
+                      displayName: this.state.user.displayName,
+                      email: this.state.user.email,
+                      status: this.state.user.status,
+                      photoUrl: this.state.user.photoUrl,
+                    });
+                  }}
+                  >
+                  <Text style={{...styles.logoutLabel}}>Chat</Text>
+                </TouchableOpacity>
+              </React.Fragment>
+            ) : null}
           </View>
         </View>
       </View>
@@ -151,6 +172,17 @@ class UserProfile extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  address: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  conAdd: {
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+    marginTop: '10%',
+    marginBottom: '10%',
+  },
   container: {
     flex: 1,
     alignItems: 'center',

@@ -24,7 +24,7 @@ class Home extends React.Component {
   }
   static navigationOptions = ({navigation}) => {
     return {
-      title: 'User List',
+      title: User.displayName,
       headerRight: (
         
         <TouchableOpacity
@@ -78,9 +78,6 @@ class Home extends React.Component {
         await this.setState({
           users: tmp,
         });
-        console.log('/////////////////////////////////////////////////////////////////////////')
-        console.log(person.uid,' homek ', User.uid, ' asda ', person );
-        
       }
     });
   };
