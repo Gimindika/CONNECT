@@ -50,22 +50,18 @@ export default class Maps extends React.Component {
           ? photo.uri
           : photo.uri.replace('file://', ''),
     });
-    console.log('as');
-
+   
     return data;
   };
 
   uploadImage = async () => {
     const url = 'http://192.168.6.184:5000';
-    console.log(this.state.imgSource);
-
-    // console.log(this.state.imgSource);
-    // console.log( this.createFormData(this.state.imgSource));
+  
     await Axios.post(`http://192.168.6.184:5000/api/user/photo`, {image:this.state.imgSource})
       .then(result => console.log(result))
       .catch(error => console.log(error))
 
-    console.log('done');
+   
     
     ///////////////////////////////////////////////////////////
     // await fetch(`http://192.168.6.184:5000/api/user/photo`, {
@@ -119,8 +115,7 @@ export default class Maps extends React.Component {
         },
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log(PermissionsAndroid.RESULTS.GRANTED);
-
+    
         this.pickImage();
       } else {
         alert('READ_EXTERNAL_STORAGE permission denied');

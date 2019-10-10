@@ -7,7 +7,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
- 
 } from 'react-native';
 import User from '../User';
 import firebase from 'firebase';
@@ -46,7 +45,6 @@ export default class Chat extends React.Component {
           };
         });
       });
-    console.log(User, 'chat');
   };
 
   inputHandler = (displayName, value) => {
@@ -100,7 +98,6 @@ export default class Chat extends React.Component {
       <View
         style={{
           flexDirection: 'row',
-          width: '50%',
           alignSelf: item.from === User.uid ? 'flex-end' : 'flex-start',
           backgroundColor: item.from === User.uid ? '#FEFD97' : '#FADA5A',
           borderRadius: 5,
@@ -125,7 +122,7 @@ export default class Chat extends React.Component {
   render() {
     const {height, width} = Dimensions.get('window');
     return (
-      <SafeAreaView style={{height:"100%"}}>
+      <SafeAreaView style={{height: '100%'}}>
         <FlatList
           style={{padding: 10, height: height * 0.8}}
           data={this.state.messageList}
@@ -144,7 +141,6 @@ export default class Chat extends React.Component {
             <Text>Send</Text>
           </TouchableOpacity>
         </View>
-       
       </SafeAreaView>
     );
   }
@@ -173,6 +169,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
- 
   },
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, TouchableHighlight, Alert} from 'react-native';
+
 import {
   StatusBar,
   Image,
@@ -7,20 +7,14 @@ import {
   StyleSheet,
   View,
   Dimensions,
-  TextInput,
-  TouchableOpacity,
-  ToastAndroid,
   ActivityIndicator,
-  Button,
 } from 'react-native';
 
 import firebase from 'firebase';
 import User from '../User';
 
-import MapView, { Marker} from 'react-native-maps';
+import MapView, {Marker} from 'react-native-maps';
 import geolocation from '@react-native-community/geolocation';
-
-import AsyncStorage from '@react-native-community/async-storage';
 
 export default class Maps extends React.Component {
   constructor(props) {
@@ -28,7 +22,6 @@ export default class Maps extends React.Component {
     this.state = {
       location: {},
       users: [],
-    
     };
 
     this.getUsers();
@@ -41,7 +34,7 @@ export default class Maps extends React.Component {
   };
 
   componentDidMount = async () => {
-    await geolocation.getCurrentPosition(
+    geolocation.getCurrentPosition(
       position => {
         let location = {
           latitude: position.coords.latitude,
@@ -53,80 +46,38 @@ export default class Maps extends React.Component {
       },
       error => console.log(error),
     );
-
-    // this.setState({users: this.props.navigation.getParam('users')});
-
-    // let dbRef = firebase.database().ref('users');
-    // // await dbRef.on('child_added', async val => {
-    // const temp = await dbRef.on('child_added', async val => { 
-    //   let person = val.val();
-    //   person.uid = val.key;
-      
-    //   if (person.uid == User.uid) {
-    //     person.displayName = User.displayName;
-        
-    //     // User.displayName = person.displayName;
-    //   } else {
-    //     let tmp = this.state.users;
-    //     tmp.push(person);
-    //     await this.setState({
-    //       users: tmp,
-    //     });
-    //     {console.log( this.state.users.length,'marker aaa')}
-    //   }
-    //   return this.state.users
-    // });
-    // {console.log( this.state.users.length,'marker atas')}
-   
-    
-    // User.longitude = await AsyncStorage.getItem('longitude');
-    // User.latitude = await AsyncStorage.getItem('latitude');
-    
   };
 
   getUsers = async () => {
     let dbRef = firebase.database().ref('users');
-    // await dbRef.on('child_added', async val => {
-    const temp = await dbRef.on('child_added', async val => { 
+
+    const temp = await dbRef.on('child_added', async val => {
       let person = val.val();
       person.uid = val.key;
-      
+
       if (person.uid == User.uid) {
         person.displayName = User.displayName;
-        
-        // User.displayName = person.displayName;
       } else {
         let tmp = this.state.users;
         tmp.push(person);
         await this.setState({
           users: tmp,
         });
-        // {console.log( this.state.users.length,'marker aaa')}
       }
-      return this.state.users
+      return this.state.users;
     });
+  };
 
-    // {console.log( this.state.users,'marker atas')}
-  }
-  
-  
   render() {
-    
-
-    {console.log( this.state.users.length,'marker atas')}
     if (this.state.users.length == 0) {
       return (
         <View style={styles.container}>
           <ActivityIndicator />
-          {/* {setTimeout(this.render),5000} */}
         </View>
       );
     } else {
-      // const {height, width} = Dimensions.get('window');
-
       return (
         <View>
-
           <StatusBar backgroundColor="orange" barStyle="light-content" />
           <MapView
             style={{width: '100%', height: '100%'}}
@@ -136,7 +87,6 @@ export default class Maps extends React.Component {
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421,
             }}
-            
             showsUserLocation={true}
             followUserLocation={true}
             zoomControlEnabled={true}
@@ -151,12 +101,10 @@ export default class Maps extends React.Component {
             showsCompass={true}
             showsPointsOfInterest={false}
             provider="google">
-           
-            
             {this.state.users.map(item => {
-           
               return (
                 <Marker
+                  key={item.latitude + item.longitude}
                   draggable
                   coordinate={{
                     latitude: item.latitude,
@@ -173,25 +121,13 @@ export default class Maps extends React.Component {
                       longitude: item.longitude,
                     });
                   }}>
-
-                    <View style={styles.mapCoor}>
-                    {/* {console.log(item.latitude, 'mapstate')} */}
-                    {/* {console.log( item.displayName,'marker show')} */}
-                    {/* {console.log( this.state.users.length,'marker show')} */}
-
-
-                  <Image
-                    source={{uri: item.photoUrl}}
-                    
-                    style={styles.image}
-                  />
+                  <View style={styles.mapCoor}>
+                    <Image source={{uri: item.photoUrl}} style={styles.image} />
                   </View>
                   <Text style={{textAlign: 'center'}}>{item.displayName}</Text>
                 </Marker>
-              )
-            })
-            }
-           
+              );
+            })}
           </MapView>
         </View>
       );

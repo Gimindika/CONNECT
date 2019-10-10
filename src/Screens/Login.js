@@ -16,7 +16,6 @@ import AsyncStorage from '@react-native-community/async-storage';
 import User from '../User';
 import geolocation from '@react-native-community/geolocation';
 
-
 class Login extends React.Component {
   state = {
     email: '',
@@ -36,7 +35,6 @@ class Login extends React.Component {
         let location = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
-  
         };
         this.setState({location: location});
       },
@@ -65,8 +63,6 @@ class Login extends React.Component {
           })
           .then(success => {
             if (success) {
-              
-
               const currentUser = firebase.auth().currentUser;
               User.uid = currentUser.uid;
               User.email = currentUser.email;
@@ -76,27 +72,25 @@ class Login extends React.Component {
                 User.displayName = currentUser.email;
               }
               User.status = 'online';
-              User.latitude = this.state.location.latitude
-              User.longitude = this.state.location.longitude
-           
+              User.latitude = this.state.location.latitude;
+              User.longitude = this.state.location.longitude;
+              let Obj = User;
+              console.log(Obj), 'Obj';
               
               AsyncStorage.setItem('userEmail', User.email);
               AsyncStorage.setItem('userDisplayName', User.displayName);
               AsyncStorage.setItem('userUid', User.uid);
               AsyncStorage.setItem('userStatus', User.status);
               AsyncStorage.setItem('photoUrl', User.photoUrl);
-              AsyncStorage.setItem('latitude', User.latitude);
-              AsyncStorage.setItem('longitude', User.longitude);
-              
-              
-              
-              firebase
+              AsyncStorage.setItem('latitude', User.latitude.toString());
+              AsyncStorage.setItem('longitude', User.longitude.toString());
+              // AsyncStorage.setItem('User', Obj)
+              firebase  
                 .database()
                 .ref('users/' + User.uid)
                 .set(User);
 
-            this.props.navigation.navigate('Home');
-
+              this.props.navigation.navigate('Home');
             }
           })
           .catch(error => {

@@ -6,10 +6,9 @@ import {
   StyleSheet,
   View,
   Dimensions,
-  TextInput,
   TouchableOpacity,
+  TextInput,
   ToastAndroid,
-  ActivityIndicator,
 } from 'react-native';
 
 import firebase from 'firebase';
@@ -17,10 +16,23 @@ import AsyncStorage from '@react-native-community/async-storage';
 import User from '../User';
 import {withNavigation} from 'react-navigation';
 
+import ImagePicker from 'react-native-image-picker';
+
+const options = {
+  title: 'Select Image',
+  storageOptions: {
+    skipBackup: true,
+    path: 'images',
+  },
+};
+
 class UserProfile extends React.Component {
   static navigationOptions = ({navigation}) => {
     return {
       title: 'Profile',
+      headerStyle: {
+        backgroundColor: '#FFB449',
+      },
     };
   };
 
@@ -32,12 +44,14 @@ class UserProfile extends React.Component {
         uid: props.navigation.getParam('uid'),
         email: props.navigation.getParam('email'),
         photoUrl: props.navigation.getParam('photoUrl'),
-        // status: props.navigation.getParam('status'),
-        longitude: props.navigation.getParam('longitude'),
-        latitude: props.navigation.getParam('latitude'),
+
+        longitude: parseFloat(props.navigation.getParam('longitude')),
+        latitude: parseFloat(props.navigation.getParam('latitude')),
       },
       textMessage: '',
       messageList: [],
+
+      editMode: false,
     };
   }
 
@@ -46,8 +60,10 @@ class UserProfile extends React.Component {
     User.displayName = await AsyncStorage.getItem('userDisplayName');
     User.uid = await AsyncStorage.getItem('userUid');
     User.status = await AsyncStorage.getItem('userStatus');
-    // User.longitude = await AsyncStorage.getItem('longitude');
-    // User.latitude = await AsyncStorage.getItem('latitude');
+
+    // AUser = await AsyncStorage.getItem('User');
+    // console.log('Auser', AUser);
+
     //handling bug, where sometimes user.email is null/////////////////////////////
     if (!this.state.user.email) {
       this.setState({
@@ -57,13 +73,98 @@ class UserProfile extends React.Component {
         },
       });
     }
-    console.log(this.state.user.longitude, ' ', User.longitude);
-   
+  };
+
+  pickImage = () => {
+    ImagePicker.showImagePicker(options, response => {
+      if (response.didCancel) {
+        console.log('You cancelled image picker');
+      } else if (response.error) {
+        alert('And error occured: ', response.error);
+      } else {
+        const source = {uri: response.uri};
+        this.setState({
+          imgSource: source,
+          user: {
+            ...this.state.user,
+            photoUrl: response.uri,
+          },
+        });
+        this.handleUploadPhoto();
+      }
+    });
+  };
+  /////////////////////////////////////////////////////////////////////////////
+  createFormData = (photo, body) => {
+    const data = new FormData();
+
+    data.append('photo', {
+      name: photo.fileName,
+      type: photo.type,
+      uri:
+        Platform.OS === 'android'
+          ? photo.uri
+          : photo.uri.replace('file://', ''),
+    });
+
+    Object.keys(body).forEach(key => {
+      data.append(key, body[key]);
+    });
+
+    return data;
+  };
+
+  handleUploadPhoto = () => {
+    fetch('http://192.168.100.82:5000/api/user/photo', {
+      method: 'POST',
+      body: this.createFormData(this.state.user.photoUrl, {userId: '123'}),
+    })
+      .then(response => response.json())
+      .then(response => {
+        console.log('upload succes', response);
+        alert('Upload success!');
+        this.setState({photo: null});
+      })
+      .catch(error => {
+        console.log('upload error', error);
+        alert('Upload failed!');
+      });
+  };
+
+  /////////////////////////////////////////////////////////////////////////////////
+  inputHandler = value => {
+    this.setState({user: {...this.state.user, displayName: value}});
+  };
+
+  editHandler = () => {
+    let user = firebase.auth().currentUser;
+    const data = this.state.user.displayName;
+
+    user
+      .updateProfile({
+        displayName: data,
+      })
+      .then(function() {
+        User.displayName = data;
+        AsyncStorage.setItem('userDisplayName', User.displayName);
+
+        ToastAndroid.showWithGravity(
+          'Update Success',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      })
+      .catch(function(error) {
+        let errorMessage = 'Update Failed ' + error;
+        ToastAndroid.showWithGravity(
+          errorMessage,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      });
   };
 
   logout = () => {
-    console.log(this.state.user, 'logout');
-
     firebase
       .database()
       .ref('users/' + User.uid)
@@ -78,36 +179,79 @@ class UserProfile extends React.Component {
     AsyncStorage.removeItem('photoUrl');
     AsyncStorage.removeItem('latitude');
     AsyncStorage.removeItem('longitude');
-    // User.uid = null;
-    // User.email = null;
-    // User.displayName = null;
-    // User.status = 'offline';
-    // User.photoUrl =
-    //   'https://res.cloudinary.com/gimindika/image/upload/v1570517127/user-icon-png-person-user-profile-icon-20_ogs0mj.png';
 
     this.props.navigation.navigate('Login');
   };
 
   render() {
-   
-
     const {height, width} = Dimensions.get('window');
     return (
       <View style={styles.container}>
         <StatusBar backgroundColor="orange" barStyle="light-content" />
         <View style={{...styles.imageContainer, width: width}}>
-          <Image
-            style={{...styles.image, width: width * 0.7, height: height / 3}}
-            source={{
-              uri: this.state.user.photoUrl,
-            }}
-          />
+          <TouchableOpacity onPress={this.pickImage}>
+            <Image
+              style={{
+                ...styles.image,
+                width: width * 0.7,
+                height: height / 3,
+              }}
+              source={{
+                uri: this.state.user.photoUrl,
+              }}
+            />
+          </TouchableOpacity>
         </View>
 
         <View style={{...styles.profileContainer, height: height * 0.7}}>
-          <Text style={{...styles.profileLabel, alignSelf: 'center'}}>
-            {this.state.user.displayName}
-          </Text>
+          <View style={{flexDirection: 'row', alignSelf: 'center'}}>
+            {!this.state.editMode ? (
+              <React.Fragment>
+                <Text style={{...styles.profileLabel, alignSelf: 'center'}}>
+                  {this.state.user.displayName}
+                </Text>
+                {this.state.user.uid == User.uid ? (
+                  <TouchableOpacity
+                    onPress={() => this.setState({editMode: true})}
+                    style={{alignItems: 'center', justifyContent: 'center'}}>
+                    <Text
+                      style={{
+                        ...styles.profileLabel,
+                        fontSize: 15,
+                        color: 'orange',
+                      }}>
+                      (edit)
+                    </Text>
+                  </TouchableOpacity>
+                ) : null}
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <TextInput
+                  onChangeText={val => this.inputHandler(val)}
+                  style={{...styles.profileLabel, alignSelf: 'center'}}
+                  value={this.state.user.displayName}
+                />
+                {this.state.user.uid == User.uid ? (
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.editHandler();
+                      this.setState({editMode: false});
+                    }}
+                    style={{alignItems: 'center', justifyContent: 'center'}}>
+                    <Text
+                      style={{
+                        ...styles.profileLabel,
+                        fontSize: 15,
+                        color: 'orange',
+                      }}>
+                      (ok)
+                    </Text>
+                  </TouchableOpacity>
+                ) : null}
+              </React.Fragment>
+            )}
+          </View>
           {this.state.user.status == 'online' ? (
             <Text style={{...styles.statusLabel, color: 'green'}}>
               {this.state.user.status}
@@ -158,8 +302,7 @@ class UserProfile extends React.Component {
                       status: this.state.user.status,
                       photoUrl: this.state.user.photoUrl,
                     });
-                  }}
-                  >
+                  }}>
                   <Text style={{...styles.logoutLabel}}>Chat</Text>
                 </TouchableOpacity>
               </React.Fragment>
@@ -218,7 +361,7 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     borderRadius: 10,
-    backgroundColor: 'red',
+    backgroundColor: '#FD6966',
     width: 100,
     height: 50,
     alignItems: 'center',

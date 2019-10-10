@@ -77,7 +77,7 @@ uploadImage = () => {
 pickImage = () => {
   ImagePicker.showImagePicker(options, response => {
     if (response.didCancel) {
-      console.log('You cancelled image picker 😟');
+      console.log('You cancelled image picker');
     } else if (response.error) {
       alert('And error occured: ', response.error);
     } else {
