@@ -101,10 +101,10 @@ export default class Maps extends React.Component {
             showsCompass={true}
             showsPointsOfInterest={false}
             provider="google">
-            {this.state.users.map(item => {
+            {this.state.users.map((item,index) => {
               return (
                 <Marker
-                  key={item.latitude + item.longitude}
+                  key={index}
                   draggable
                   coordinate={{
                     latitude: item.latitude,

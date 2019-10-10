@@ -51,16 +51,58 @@ class UserProfile extends React.Component {
       textMessage: '',
       messageList: [],
 
+      userEmail: '',
+      userDisplayName: '',
+      userUid: '',
+      userStatus: '',
+
+
       editMode: false,
     };
+
+    // AsyncStorage.getItem('userEmail', (error, result) => {
+    //   if (result) {
+    //     this.setState({
+    //       userEmail: result,
+    //     });
+    //   }
+    // });
+    // AsyncStorage.getItem('userDisplayName', (error, result) => {
+    //   if (result) {
+    //     this.setState({
+    //       userDisplayName: result,
+    //     });
+    //   }
+    // });
+    // AsyncStorage.getItem('userUid', (error, result) => {
+    //   if (result) {
+    //     this.setState({
+    //       userUid: result,
+    //     });
+    //   }
+    // });
+    // AsyncStorage.getItem('userStatus', (error, result) => {
+    //   if (result) {
+    //     this.setState({
+    //       userStatus: result,
+    //     });
+    //   }
+    // });
   }
 
   componentDidMount = async () => {
+ 
     User.email = await AsyncStorage.getItem('userEmail');
     User.displayName = await AsyncStorage.getItem('userDisplayName');
     User.uid = await AsyncStorage.getItem('userUid');
     User.status = await AsyncStorage.getItem('userStatus');
-
+   
+      // User.email = this.state.userEmail;
+      // User.displayName = this.state.userDisplayName;
+      // User.uid = this.state.userUid;
+      // User.status =  this.state.userStatus;
+    
+    
     // AUser = await AsyncStorage.getItem('User');
     // console.log('Auser', AUser);
 
@@ -261,7 +303,7 @@ class UserProfile extends React.Component {
               {this.state.user.status}
             </Text>
           )}
-          <Text style={styles.profileLabel}>
+          <Text style={{...styles.profileLabel,fontSize:18}}>
             {'Email : ' + this.state.user.email}
           </Text>
 
@@ -348,7 +390,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   profileLabel: {
-    fontSize: 20,
+    fontSize: 25,
     marginLeft: 10,
     fontWeight: '600',
     marginVertical: 5,
