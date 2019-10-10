@@ -75,15 +75,15 @@ class Login extends React.Component {
               User.latitude = this.state.location.latitude;
               User.longitude = this.state.location.longitude;
               let Obj = User;
-              console.log(Obj), 'Obj';
+             
               
               AsyncStorage.setItem('userEmail', User.email);
               AsyncStorage.setItem('userDisplayName', User.displayName);
               AsyncStorage.setItem('userUid', User.uid);
               AsyncStorage.setItem('userStatus', User.status);
               AsyncStorage.setItem('photoUrl', User.photoUrl);
-              AsyncStorage.setItem('latitude', User.latitude.toString());
-              AsyncStorage.setItem('longitude', User.longitude.toString());
+              // AsyncStorage.setItem('latitude', User.latitude.toString());
+              // AsyncStorage.setItem('longitude', User.longitude.toString());
               // AsyncStorage.setItem('User', Obj)
               firebase  
                 .database()

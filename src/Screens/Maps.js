@@ -24,7 +24,6 @@ export default class Maps extends React.Component {
       users: [],
     };
 
-    this.getUsers();
   }
 
   static navigationOptions = () => {
@@ -34,6 +33,8 @@ export default class Maps extends React.Component {
   };
 
   componentDidMount = async () => {
+    this.getUsers();
+
     geolocation.getCurrentPosition(
       position => {
         let location = {

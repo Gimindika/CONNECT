@@ -42,24 +42,25 @@ export default class AppStateExample extends Component {
   };
 
   _handleAppStateChange = async nextAppState => {
-    User.uid = await AsyncStorage.getItem('userUid');
-    User.email = await AsyncStorage.getItem('userEmail');
-    User.displayName = await AsyncStorage.getItem('userDisplayName');
+    // User.uid = await AsyncStorage.getItem('userUid');
+    // User.email = await AsyncStorage.getItem('userEmail');
+    // User.displayName = await AsyncStorage.getItem('userDisplayName');
 
-    geolocation.getCurrentPosition(
-      position => {
-        let location = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        };
-        this.setState({location: location});
-      },
-      error => console.log(error),
-    );
+    // geolocation.getCurrentPosition(
+    //   position => {
+    //     let location = {
+    //       latitude: position.coords.latitude,
+    //       longitude: position.coords.longitude,
+    //     };
+    //     this.setState({location: location});
+    //   },
+    //   error => console.log(error),
+    // );
 
-    User.latitude = this.state.location.latitude;
-    User.longitude = this.state.location.longitude;
-
+    // User.latitude = this.state.location.latitude;
+    // User.longitude = this.state.location.longitude;
+      
+        
     if (
       this.state.appState.match(/inactive|background/) &&
       nextAppState === 'active'

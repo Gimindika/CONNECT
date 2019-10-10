@@ -10,16 +10,20 @@ import {
   Dimensions,
 } from 'react-native';
 import firebase from 'firebase';
-import AsyncStorage from '@react-native-community/async-storage';
+
 import User from '../User';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
 import {withNavigation} from 'react-navigation';
 
+import geolocation from '@react-native-community/geolocation';
+
+
 class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {users: [], recent: [], recentUid: [], isRecent: false};
+
   }
   static navigationOptions = ({navigation}) => {
     return {
@@ -48,11 +52,28 @@ class Home extends React.Component {
     };
   };
 
+  getLocation = async () => {
+    await geolocation.getCurrentPosition(
+      position => {
+        let location = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        };
+        this.setState({location: location});
+        User.latitude = location.latitude;
+        User.longitude = location.longitude;
+        return position;
+      },
+      error => console.log(error),
+    );
+  };
+
   componentDidMount = () => {
-    // User.longitude = await AsyncStorage.getItem('longitude');
+    
 
     this.getAllUsers();
     this.getRecentUid();
+    this.getLocation();
   };
 
   getAllUsers = async () => {
@@ -189,7 +210,7 @@ class Home extends React.Component {
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity
             style={{
-              backgroundColor: '#ADD8E6',
+              backgroundColor: '#FEDEBE',
               width: width / 2 - 20,
               height: height * 0.09,
               alignItems: 'center',
